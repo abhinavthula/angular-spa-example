@@ -27,45 +27,95 @@ steps:
     command: custom
     customCommand: run build -- --prod
     workingDir: src
-  
-- task: PublishPipelineArtifact@0
+
+- task: Npm@1
+  displayName: 'Execute Unit Tests'
   inputs:
-    artifactName: 'angular'
-    targetPath: 'src/app/dist'
-  
+    command: custom
+    workingDir: src
+    verbose: false
+    customCommand: 'run test -- --code-coverage --watch=false'
+
+# - task: PublishCodeCoverageResults@1
+#   displayName: 'Publish Code Coverage Results'
+#   inputs:
+#     codeCoverageTool: Cobertura
+#     summaryFileLocation: 'src/coverage/DigitalHub/cobertura-coverage.xml'
+
+# steps:
+# - task: PublishTestResults@2
+#   displayName: 'Publish Unit Test Results '
+#   inputs:
+#     testResultsFiles: '**/TEST*.xml'
+#     searchFolder: '$(System.DefaultWorkingDirectory)/Frontend/junit'
+
+
+# steps:
+# - script: |
+#    pwd
+   
+#    dir
+   
+#    cd Frontend/
+   
+#    pwd
+   
+#    dir
+#   displayName: 'Command Line Script'
+
+steps:
+- task: CopyFiles@2
+  displayName: 'Copy Files to: $(Build.ArtifactStagingDirectory)'
+  inputs:
+    SourceFolder: '$(Build.SourcesDirectory)/Frontend/dist'
+    Contents: '**/*'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)'
+
+steps:
 - task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifacts'
   inputs:
-    PathtoPublish: 'src/app/dist'
-    ArtifactName: angular2
+    ArtifactName: DigitalHubFrontend
+
   
-- task: Npm@1
-  displayName: 'Test Angular'
-  inputs:
-    command: custom
-    customCommand: run test -- --watch=false --code-coverage
-    workingDir: src/angular7
+# - task: PublishPipelineArtifact@0
+#   inputs:
+#     artifactName: 'angular'
+#     targetPath: 'src/app/dist'
   
-- task: PublishCodeCoverageResults@1
-  displayName: 'Publish code coverage Angular results'
-  condition: succeededOrFailed()
-  inputs:
-    codeCoverageTool: Cobertura
-    summaryFileLocation: 'src/angular7/coverage/cobertura-coverage.xml'
-    reportDirectory: src/app/coverage
-    failIfCoverageEmpty: true
+# - task: PublishBuildArtifacts@1
+#   inputs:
+#     PathtoPublish: 'src/app/dist'
+#     ArtifactName: angular2
   
-- task: PublishTestResults@2
-  displayName: 'Publish Angular test results'
-  condition: succeededOrFailed()
-  inputs:
-    searchFolder: $(System.DefaultWorkingDirectory)/src/app/junit
-    testRunTitle: Angular
-    testResultsFormat: JUnit
-    testResultsFiles: "**/TESTS*.xml"
+# - task: Npm@1
+#   displayName: 'Test Angular'
+#   inputs:
+#     command: custom
+#     customCommand: run test -- --watch=false --code-coverage
+#     workingDir: src/angular7
   
-- task: Npm@1
-  displayName: 'Lint Angular'
-  inputs:
-    command: custom
-    customCommand: run lint --  --format=stylish
-    workingDir: src/angular7      
+# - task: PublishCodeCoverageResults@1
+#   displayName: 'Publish code coverage Angular results'
+#   condition: succeededOrFailed()
+#   inputs:
+#     codeCoverageTool: Cobertura
+#     summaryFileLocation: 'src/angular7/coverage/cobertura-coverage.xml'
+#     reportDirectory: src/app/coverage
+#     failIfCoverageEmpty: true
+  
+# - task: PublishTestResults@2
+#   displayName: 'Publish Angular test results'
+#   condition: succeededOrFailed()
+#   inputs:
+#     searchFolder: $(System.DefaultWorkingDirectory)/src/app/junit
+#     testRunTitle: Angular
+#     testResultsFormat: JUnit
+#     testResultsFiles: "**/TESTS*.xml"
+  
+# - task: Npm@1
+#   displayName: 'Lint Angular'
+#   inputs:
+#     command: custom
+#     customCommand: run lint --  --format=stylish
+#     workingDir: src/angular7      
